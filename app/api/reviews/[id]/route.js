@@ -1,5 +1,5 @@
 import connectToDatabase from '@/lib/mongodb';
-import Post from '@/models/Post';
+import Review from '@/models/Review';
 
 export async function GET(req, { params }) {
   await connectToDatabase();
