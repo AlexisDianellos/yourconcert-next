@@ -1,9 +1,11 @@
 'use client';
-import { useState,useRef } from 'react';
+import { useState,useRef,useEffect } from 'react';
+import { useRouter,useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import HeaderStar from './HeaderStar';
+import HeaderStar from '@/components/HeaderStar';
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
+import { FaRegStar,FaStar } from "react-icons/fa";
 
 const modules = {
   toolbar: [
@@ -20,10 +22,14 @@ const formats = [
   'bold', 'italic', 'underline', 'strike', 'blockquote',
   'list', 'bullet', 'indent',
   'link', 'image'
-];
+]
 
-export default function CreatePostForm() {
+const Edit = () => {
+  
+  const { id } = useParams();  
   const { data: session } = useSession();
+  const [review,setReview]=useState(null);
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [pq,setPq]=useState(0);
@@ -31,22 +37,59 @@ export default function CreatePostForm() {
   const [crowd,setCrowds]=useState(0);
   const [visuals,setVisuals]=useState(0);
   const [venue,setVenue]=useState(0);
+  const [image,setImage]=useState(null);
   const inputFileRef = useRef(null);
-  const [blob, setBlob] = useState(null);
-  const [helpText,setHelpText]=useState(null);
 
+  const [helpText,setHelpText]=useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/reviews/${id}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch review');
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setReview(data);
+          setTitle(data.title);
+          setContent(data.content);
+          setPq(data.pq);
+          setSongs(data.songs);
+          setCrowds(data.crowd);
+          setVisuals(data.visuals);
+          setVenue(data.venue);   
+          setImage(data.image);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching review:', error);
+          setError('Failed to load the review');
+          setLoading(false);
+        });
+    }
+  }, [id]);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!session) {
-      console.error('You must be signed in to create a post.');
+      console.error('You must be signed in to edit a review.');
+      return;
+    }
+    if(review.createdBy._id!==session?.user?.id ){
+      console.error('This isnt your review.');
       return;
     }
 
     const file = inputFileRef.current.files[0];
 
     const formData = new FormData();
-    formData.append('file', file);
+    
     formData.append('title', title);
     formData.append('content', content);
 
@@ -56,18 +99,19 @@ export default function CreatePostForm() {
     formData.append('visuals', visuals);
     formData.append('venue', venue);
 
-    const response = await fetch(`/api/reviews?filename=${file.name}`, {
-      method: 'POST',
+    if (file) {
+      formData.append('file', file);
+    }
+
+    const response = await fetch(`/api/reviews/${id}${file ?`?filename=${file?.name}`:''}`, {
+      method: 'PATCH',
       body: formData,
     });
     if (response.ok) {
-      const newBlob = (await response.json());
-      setBlob(newBlob);
-      
-      //setTitle('');
-      //setContent('');
+      const updatedReview = await response.json();
+      setReview(updatedReview);
     }else{
-      console.error('Failed to create review');
+      console.error('Failed to edit review');
     }
   };
 
@@ -94,7 +138,7 @@ export default function CreatePostForm() {
 
   return (
     <form onSubmit={handleSubmit} className="p-7 w-full lg:w-2/3 mx-auto flex flex-col items-center justify-center text-center">
-        <h1 className="text-3xl font-bold text-center mb-10">Create a Concert Review</h1>
+        <h1 className="text-3xl font-bold text-center mb-10">Edit Review</h1>
         <label type="title" className="text-2xl font-bold">Concert Title</label>
         <input
           type="text"
@@ -104,25 +148,26 @@ export default function CreatePostForm() {
           className="mt-1 w-3/4 lg:w-1/2 px-3 py-2 rounded-md shadow-sm focus:outline-none sm:text-sm text-black"
         />
         <div className="flex items-center">
-          <HeaderStar header="Performance Quality" onRatingChange={setPq}/>
+          <HeaderStar header="Performance Quality" onRatingChange={setPq} value={pq}/>
           <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('pq')}>
             help
           </span>
         </div>
+
         <div className="flex items-center">
-          <HeaderStar header="Setlist/Song Choices" onRatingChange={setSongs}/>
+          <HeaderStar header="Setlist/Song Choices" onRatingChange={setSongs} value={songs}/>
           <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('song')}>
             help
           </span>
         </div>
         <div className="flex items-center">
-        <HeaderStar header="Crowd Interaction" onRatingChange={setCrowds}/>
+        <HeaderStar header="Crowd Interaction" onRatingChange={setCrowds} value={crowd}/>
         <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('crowd')}>
           help
         </span>
         </div>
         <div className="flex items-center">
-        <HeaderStar header="Visuals" onRatingChange={setVisuals}/>
+        <HeaderStar header="Visuals" onRatingChange={setVisuals} value={visuals}/>
         <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('visuals')}>
           help
         </span>
@@ -146,7 +191,7 @@ export default function CreatePostForm() {
   )}
 
 
-      <hr className="lg:w-1/2 md:w-1/2 w-full border-t border-gray-300 p-3" />
+      <hr className="w-full border-t border-gray-300 p-3" />
         <div className="flex items-center">
           <p className='text-center text-2xl font-bold p-5'>Review</p>
           <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('review')}>
@@ -158,12 +203,19 @@ export default function CreatePostForm() {
               modules={modules}
               formats={formats}
               onChange={(newValue) => setContent(newValue)}
-              className='bg-white text-black lg:w-1/2 md:w-1/2 w-5/6'
+              className='bg-white text-black'
               />
   
-      <hr className="lg:w-1/2 md:w-1/2 w-full border-t border-gray-300 p-3 mt-10" />
+      <hr className="w-full border-t border-gray-300 p-3 mt-10" />
        <div>
           <label className="block text-2xl p-5 font-bold text-center">Review Cover</label>
+          <h1 className="font-bold text-xl p-5">Current Review Cover</h1>
+          <div className="flex justify-center">
+          <div className='w-3/4 h-96 overflow-hidden rounded-md mt-2 mb-2'>
+            <img src={image} className='w-full h-full object-cover'></img>
+          </div>
+          </div>
+          <p className="font-bold text-xl p-5">OR</p>
           <input
             type="file"
             ref={inputFileRef}
@@ -174,13 +226,10 @@ export default function CreatePostForm() {
           type="submit"
           className="w-1/2 mt-10 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-500 hover:bg-teal-600"
         >
-        Create Review
+        Edit Review
       </button>
-      {blob && (
-        <div>
-          <a href={blob.url} className="text-white">{blob.url}</a>
-        </div>
-      )}
     </form>
-  );
+  )
 }
+
+export default Edit

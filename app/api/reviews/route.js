@@ -4,6 +4,7 @@ import Review from '@/models/Review';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
+import { put } from '@vercel/blob';
 
 export async function GET(req) {
   await connectToDatabase();
@@ -20,17 +21,37 @@ export async function POST(req) {
       return NextResponse.json({error:"Not Authenticated"},{status:401});
     }
     await connectToDatabase();
-    const {title,content} = await req.json();
+    
+    const {searchParams}=new URL(req.url);
+    const filename = searchParams.get('filename') || "";
 
-    if (!title || !content) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    if (filename){
+      const formData = await req.formData();
+      const title = formData.get('title');
+      const content = formData.get('content');
+      const file = formData.get('file');
+      const pq = formData.get('pq');
+      const songs = formData.get('songs');
+      const crowd = formData.get('crowd');
+      const visuals = formData.get('visuals');
+      const venue = formData.get('venue');
+
+      if (!title || !content || !pq || !songs || !crowd || !visuals || !venue) {
+        return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      }
+
+      const blob = await put(filename, file, {
+        access: 'public',
+      });
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
-    const newReview = await Review.create({title,content,createdBy:userId})
-    const populatedPost = await Review.findById(newReview._id).populate('createdBy', 'name').exec();
-    return new Response(JSON.stringify(populatedPost), { status: 201 });
 
+    const newReview = await Review.create({title,content,pq,songs,crowd,visuals,venue,image:blob.url,createdBy:userId});
+
+    const populatedPost = await Review.findById(newReview._id).populate('createdBy', 'name').exec();
+
+    return NextResponse.json(blob);
+  }
   }catch(error){
     console.error('Error creating post:', error);
     return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });

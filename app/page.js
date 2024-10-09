@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import CreatePostForm from '@/components/createform';
 import {useSession} from 'next-auth/react';
+import Review from '@/components/Review';
 
 export default function Home() {
   
@@ -15,20 +15,19 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="flex flex-col items-center p-6">
       {session?
         <p className="text-xl font-bold text-start mb-5">Welcome back, {session.user?.name}</p>
         :<></>
-      }
-      
-      <ul>
-        {reviews.map((review) => (
-          <li key={review._id} className="mt-4">
-            <h2 className="text-xl font-semibold">{review.title}</h2>
-            <p>{review.content} {review.createdBy?.name}</p>
-          </li>
-        ))}
-      </ul>
+      }  
+      <div className="w-full max-w-2xl ml-5 mr-5 lg:ml-0 lg:mr-0 md:ml-0 md:mr-0 pb-5">
+          {reviews.length>0 && reviews.map((review) => (
+              <Review
+                key={review._id}
+                {...review}
+              />
+          ))}
+      </div>
     </div>
   );
 }

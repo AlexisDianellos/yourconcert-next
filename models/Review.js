@@ -10,6 +10,26 @@ const ReviewSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide content'],
   },
+  pq: {
+    type: String,
+    required: [true, 'Please provide performance quality rating'],
+  },
+  songs: {
+    type: String,
+    required: [true, 'Please provide songs rating'],
+  },
+  crowd: {
+    type: String,
+    required: [true, 'Please provide crowd interaction rating'],
+  },
+  visuals: {
+    type: String,
+    required: [true, 'Please provide visuals rating'],
+  },
+  venue: {
+    type: String,
+    required: [true, 'Please provide venue rating'],
+  },
   createdAt: {
     type: Date,
     default: Date.now,

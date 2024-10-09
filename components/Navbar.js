@@ -2,17 +2,23 @@
 'use client';
 import React, { useContext, useEffect, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
+import { useRouter,useParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function CreatePostForm() {
 
   const [searchContent,setSearchContent]=useState('');
   const { data: session } = useSession();
+  const router=useRouter();
 
  function handleKeyDown(e) {
   if (e.key === 'Enter') {
     handleSearch();
   }
+}
+
+const handleSearch=()=>{
+  router.push(`/search?query=${encodeURIComponent(searchContent)}`)
 }
 
 const handleLogout = async()=>{
