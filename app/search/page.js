@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Review from '@/components/Review';
+import Suspense from 'react'
 
 const SearchPage = () => {
   const searchParams =  useSearchParams();
@@ -40,5 +41,11 @@ const SearchPage = () => {
 
   );
 };
+
+const PageWrapper = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <SearchPage />
+  </Suspense>
+);
 
 export default SearchPage;
