@@ -3,27 +3,9 @@ import { useEffect, useState,useRef } from 'react';
 import { useRouter,useParams } from 'next/navigation';
 import Link from 'next/link';
 import {useSession } from 'next-auth/react';
-import { FaRegStar,FaStar } from "react-icons/fa";
-import ReactQuill from "react-quill";
+import { FaRegStar,FaStar } from "react-icons/fa";;
 import 'react-quill/dist/quill.snow.css';
-import HeaderStar from '@/components/HeaderStar';
-
-const modules = {
-  toolbar: [
-    [{ 'header': [1, 2, false] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-    ['link', 'image'],
-    ['clean']
-  ],
-};
-
-const formats = [
-  'header',
-  'bold', 'italic', 'underline', 'strike', 'blockquote',
-  'list', 'bullet', 'indent',
-  'link', 'image'
-];
+import Image from 'next/image';
 
 export default function ReviewDetail(){
   const { id } = useParams();  
@@ -36,13 +18,6 @@ export default function ReviewDetail(){
   const [content, setContent] = useState('');
   const inputFileRef = useRef(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const [pq,setPq]=useState(0);
-  const [songs,setSongs]=useState(0);
-  const [crowd,setCrowds]=useState(0);
-  const [visuals,setVisuals]=useState(0);
-  const [venue,setVenue]=useState(0);
-  const [image,setImage]=useState(null);
   
   useEffect(() => {
     if (id) {
@@ -56,13 +31,7 @@ export default function ReviewDetail(){
         .then((data) => {
           setReview(data);
           setTitle(data.title);
-          setContent(data.content);
-          setPq(data.pq);
-          setSongs(data.songs);
-          setCrowds(data.crowd);
-          setVisuals(data.visuals);
-          setVenue(data.venue);   
-          setImage(data.image);
+          setContent(data.content); 
           setLoading(false);
         })
         .catch((error) => {
@@ -204,7 +173,7 @@ export default function ReviewDetail(){
       )}
     </div>
     <div className="mb-5">
-      <img src={review.image} alt={review.title} className="w-full h-auto object-cover rounded-md" />
+      <Image src={review.image} width={500} height={500} alt={review.title} className="w-full h-auto object-cover rounded-md" />
     </div>
     <div className='flex justify-center'>
       <hr className="w-full border-t border-gray-300 my-4 " />

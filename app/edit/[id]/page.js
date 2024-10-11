@@ -1,11 +1,11 @@
 'use client';
 import { useState,useRef,useEffect } from 'react';
-import { useRouter,useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import HeaderStar from '@/components/HeaderStar';
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
-import { FaRegStar,FaStar } from "react-icons/fa";
+import Image from 'next/image';
 
 const modules = {
   toolbar: [
@@ -212,7 +212,7 @@ const Edit = () => {
           <h1 className="font-bold text-xl p-5">Current Review Cover</h1>
           <div className="flex justify-center">
           <div className='w-3/4 h-96 overflow-hidden rounded-md mt-2 mb-2'>
-            <img src={image} className='w-full h-full object-cover'></img>
+            <Image src={image} width={500} height={500} className='w-full h-full object-cover'></Image>
           </div>
           </div>
           <p className="font-bold text-xl p-5">OR</p>

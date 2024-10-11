@@ -1,6 +1,5 @@
 import connectToDatabase from '@/lib/mongodb';
 import Review from '@/models/Review';
-import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
