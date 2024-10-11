@@ -37,7 +37,6 @@ const Profile = () => {
     );
   }
   
-  
   return (
     <div className="flex flex-col items-center p-6">
     <div className="shadow-md w-full max-w-5xl mx-auto p-6 rounded-b-lg flex flex-col items-center text-center space-y-4">

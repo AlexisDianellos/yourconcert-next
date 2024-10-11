@@ -3,6 +3,7 @@ import { useState,useRef,useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import HeaderStar from './HeaderStar';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
@@ -34,8 +35,11 @@ export default function CreatePostForm() {
   const [visuals,setVisuals]=useState(0);
   const [venue,setVenue]=useState(0);
   const inputFileRef = useRef(null);
-  const [blob, setBlob] = useState(null);
   const [helpText,setHelpText]=useState(null);
+  const [loading, setLoading] = useState(null);
+  const [error, setError] = useState(null);
+  const router = useRouter();
+  const [disabled,setDisabled]=useState(null);
 
   useEffect(() => {
     if (!session) {
@@ -46,10 +50,18 @@ export default function CreatePostForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDisabled(true);
 
     const file = inputFileRef.current.files[0];
     if (!file) {
       console.error('Please select an Image for your review.');
+      setError('No Image chosen.')
+      setDisabled(null);
+      return;
+    }
+    if(!title || !content || !songs || !visuals || !venue){
+      setError('Please fill in all fields.');
+      setDisabled(null);
       return;
     }
 
@@ -64,19 +76,24 @@ export default function CreatePostForm() {
     formData.append('visuals', visuals);
     formData.append('venue', venue);
 
+    try{
     const response = await fetch(`/api/reviews?filename=${file.name}`, {
       method: 'POST',
       body: formData,
     });
     if (response.ok) {
-      const newBlob = (await response.json());
-      setBlob(newBlob);
-      
-      //setTitle('');
-      //setContent('');
+      router.push('/');
     }else{
       console.error('Failed to create review');
+      setError('Failed to create review.');
+      setDisabled(null);
     }
+  }catch(error){
+    console.error('Error creating review:', error);
+    setLoading(null);
+    setError(error);
+    setDisabled(null);
+  }
   };
 
   const handleClick = async (option)=>{
@@ -98,6 +115,14 @@ export default function CreatePostForm() {
     }
     setHelpText(sentence);
 
+  }
+
+    if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-white"></div>
+      </div>
+    );
   }
 
   return (
@@ -178,17 +203,14 @@ export default function CreatePostForm() {
             className="mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none sm:text-sm text-black bg-white"
           />
         </div>
-        <button
+      <button
           type="submit"
           className="w-1/2 mt-10 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-500 hover:bg-teal-600"
+          disabled={disabled}
         >
-        Create Review
+        {disabled?'Creating...':'Create Review'}
       </button>
-      {blob && (
-        <div>
-          <a href={blob.url} className="text-white">{blob.url}</a>
-        </div>
-      )}
+      {error&&<p className="text-red-500 p-3">{error}</p>}
     </form>
   );
 }

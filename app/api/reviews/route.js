@@ -50,7 +50,7 @@ export async function POST(req) {
 
     const populatedPost = await Review.findById(newReview._id).populate('createdBy', 'name').exec();
 
-    return NextResponse.json(blob);
+    return NextResponse.json(populatedPost, { status: 200 });
   }
   }catch(error){
     console.error('Error creating post:', error);

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import HeaderStar from '@/components/HeaderStar';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import dynamic from 'next/dynamic';
 
@@ -42,10 +43,12 @@ const Edit = () => {
   const [venue,setVenue]=useState(0);
   const [image,setImage]=useState(null);
   const inputFileRef = useRef(null);
+  const router = useRouter();
 
   const [helpText,setHelpText]=useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [disabled,setDisabled]=useState(null);
 
 
   useEffect(() => {
@@ -67,21 +70,23 @@ const Edit = () => {
           setVisuals(data.visuals);
           setVenue(data.venue);   
           setImage(data.image);
-          setLoading(false);
+          setLoading(null);
         })
         .catch((error) => {
           console.error('Error fetching review:', error);
           setError('Failed to load the review');
-          setLoading(false);
+          setLoading(null);
         });
     }
   }, [id]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDisabled(true);
 
     if (!session) {
       console.error('You must be signed in to edit a review.');
+      setError('You must be signed in to edit a review.');
       return;
     }
     if(review.createdBy._id!==session?.user?.id ){
@@ -106,6 +111,13 @@ const Edit = () => {
       formData.append('file', file);
     }
 
+    if(!title || !content || !songs || !visuals || !venue){
+      setError('Please fill in all fields.');
+      setDisabled(null);
+      return;
+    }
+
+    try{
     const response = await fetch(`/api/reviews/${id}${file ?`?filename=${file?.name}`:''}`, {
       method: 'PATCH',
       body: formData,
@@ -113,8 +125,18 @@ const Edit = () => {
     if (response.ok) {
       const updatedReview = await response.json();
       setReview(updatedReview);
+      router.push(`/review/${review._id}`);
+      
     }else{
       console.error('Failed to edit review');
+      setError('Failed to edit review.');
+      setDisabled(null);
+    }
+    }catch(error){
+      console.error('Error editing review:', error);
+      setLoading(null);
+      setError(error);
+      setDisabled(null)
     }
   };
 
@@ -139,8 +161,13 @@ const Edit = () => {
 
   }
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-white"></div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="p-7 w-full lg:w-2/3 mx-auto flex flex-col items-center justify-center text-center">
@@ -179,7 +206,7 @@ const Edit = () => {
         </span>
         </div>
         <div className="flex items-center">
-        <HeaderStar header="Venue"onRatingChange={setVenue}/>
+        <HeaderStar header="Venue"onRatingChange={setVenue} value={venue}/>
         <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('venue')}>
           help
         </span>
@@ -231,9 +258,11 @@ const Edit = () => {
         <button
           type="submit"
           className="w-1/2 mt-10 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-500 hover:bg-teal-600"
+          disabled={disabled}
         >
-        Edit Review
+        {disabled?'Editing...':'Edit Review'}
       </button>
+      {error&&<p className="text-red-500 p-3">{error}</p>}
     </form>
   )
 }

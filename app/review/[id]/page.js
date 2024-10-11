@@ -84,12 +84,17 @@ export default function ReviewDetail(){
     const visuals=parseFloat(review.visuals)||0;
     const venue=parseFloat(review.venue)||0;
 
-    const rating = pq*0.4+songs*0.2+crowd*0.2+visuals*0.1+venue*0.1
+    const rating = Math.round(pq*0.4+songs*0.2+crowd*0.2+visuals*0.1+venue*0.1).toFixed(1);
     return rating;
   }
   
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-white"></div>
+      </div>
+    );
+  }
 
   return(
     <div className="p-6">
@@ -118,7 +123,8 @@ export default function ReviewDetail(){
       arrow_back
     </Link>
     <div className='flex lg:flex-row md:flex-row sm:flex-row lg:mb-8 md:mb-8 sm:mb-8 flex-col justify-center'>
-      <h1 className="text-2xl font-bold text-center">{review.title}</h1>
+    {error&&<p className="text-red-500 p-3">{error}</p>}
+      <h1 className="text-2xl font-bold text-center lg:p-0 md:p-0 sm:p-0 p-3">{review.title}</h1>
       {review.createdBy._id===session?.user?.id && (
           <div className='text-center mt-3 mb-3 lg:mt-0 md:mt-0 sm:mt-0 lg:mb-0 md:mb-0 sm:mb-0'>
             <Link
