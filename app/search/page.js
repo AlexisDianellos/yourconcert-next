@@ -1,11 +1,10 @@
 // app/search/page.js
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState,Suspense } from 'react';
 import Review from '@/components/Review';
-import Suspense from 'react'
 
-const SearchPage = () => {
+function SearchPage() {
   const searchParams =  useSearchParams();
   const [reviews, setReviews] = useState([]);
 
@@ -42,10 +41,10 @@ const SearchPage = () => {
   );
 };
 
-const PageWrapper = () => (
-  <Suspense fallback={<div>Loading...</div>}>
-    <SearchPage />
-  </Suspense>
-);
-
-export default SearchPage;
+export default function PageWrapper () {
+  return(
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPage />
+    </Suspense>
+  )
+};
