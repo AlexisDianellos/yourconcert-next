@@ -48,9 +48,10 @@ const Profile = () => {
       <div className="w-full max-w-5xl mx-auto py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 p-5 m-5">
         {reviews && reviews.length > 0 &&
           reviews.map((review) => (
-            <div>
-              <Review key={review._id} {...review} />
-            </div>
+              <Review
+                key={review._id}
+                {...review}
+              />
           ))
         }
       </div>

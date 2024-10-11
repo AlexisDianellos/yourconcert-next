@@ -1,7 +1,6 @@
 import React from 'react';
 import {format, differenceInHours, differenceInMinutes } from "date-fns";
 import Link from 'next/link';
-
 const Review = ({_id,title,content,image,createdAt,createdBy})=>{
   const createdDate = new Date(createdAt);
   const now = new Date();
