@@ -1,8 +1,10 @@
 'use client';
-import { useState,useRef } from 'react';
+import { useState,useRef,useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import HeaderStar from './HeaderStar';
-import ReactQuill from "react-quill";
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
 
 const modules = {
@@ -35,15 +37,21 @@ export default function CreatePostForm() {
   const [blob, setBlob] = useState(null);
   const [helpText,setHelpText]=useState(null);
 
+  useEffect(() => {
+    if (!session) {
+      console.error('You must be signed in to create a post.');
+      console.log(session)
+    }
+  }, [session]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!session) {
-      console.error('You must be signed in to create a post.');
+    const file = inputFileRef.current.files[0];
+    if (!file) {
+      console.error('Please select an Image for your review.');
       return;
     }
-
-    const file = inputFileRef.current.files[0];
 
     const formData = new FormData();
     formData.append('file', file);
@@ -105,31 +113,31 @@ export default function CreatePostForm() {
         />
         <div className="flex items-center">
           <HeaderStar header="Performance Quality" onRatingChange={setPq}/>
-          <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('pq')}>
+          <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('pq')}>
             help
           </span>
         </div>
         <div className="flex items-center">
           <HeaderStar header="Setlist/Song Choices" onRatingChange={setSongs}/>
-          <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('song')}>
+          <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('song')}>
             help
           </span>
         </div>
         <div className="flex items-center">
         <HeaderStar header="Crowd Interaction" onRatingChange={setCrowds}/>
-        <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('crowd')}>
+        <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('crowd')}>
           help
         </span>
         </div>
         <div className="flex items-center">
         <HeaderStar header="Visuals" onRatingChange={setVisuals}/>
-        <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('visuals')}>
+        <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('visuals')}>
           help
         </span>
         </div>
         <div className="flex items-center">
         <HeaderStar header="Venue"onRatingChange={setVenue}/>
-        <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('venue')}>
+        <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('venue')}>
           help
         </span>
         </div>
@@ -149,7 +157,7 @@ export default function CreatePostForm() {
       <hr className="lg:w-1/2 md:w-1/2 w-full border-t border-gray-300 p-3" />
         <div className="flex items-center">
           <p className='text-center text-2xl font-bold p-5'>Review</p>
-          <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('review')}>
+          <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('review')}>
             help
           </span>
         </div>

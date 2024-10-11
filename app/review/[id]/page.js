@@ -67,36 +67,6 @@ export default function ReviewDetail(){
     }
   }
 
-  const editReview = async(id)=>{
-  
-    if (!session) {
-      console.error('You must be signed in to edit a review.');
-      return;
-    }
-  
-    const file = inputFileRef.current.files[0];
-  
-    const formData = new FormData();
-    formData.append('file', file)
-    formData.append('title', title)
-    formData.append('content', content)
-    try{
-      const res = await fetch(`/api/reviews/${id}?filename=${file.name}`,{
-        method:'PATCH',
-        body: formData,
-      });
-      if (res.ok) {
-        // Redirect to the home page after successful deletion
-        const updatedReview = await res.json();
-        setReview(updatedReview)
-      } else {
-        throw new Error('Failed to edit review');
-      }
-    }catch(err){
-      console.error('Error editing review: ',err);
-    }
-  }
-
   const renderStars = (rating) => {
     return [...Array(5)].map((_, index) => (
       index < rating ? (
@@ -165,7 +135,7 @@ export default function ReviewDetail(){
               className='lg:ml-5 md:ml-5 sm:ml-5 text-center lg:mt-0 md:mt-0 sm:mt-0 lg:mb-0 md:mb-0 sm:mb-0 mb-2 mt-2 p-4 lg:p-0 md:p-0 sm:p-0'
               onClick={()=>setShowDeleteModal(true)}
             >
-              <span class="material-symbols-outlined text-xl">
+              <span className="material-symbols-outlined text-xl">
                 delete
               </span>
             </button>
@@ -173,7 +143,7 @@ export default function ReviewDetail(){
       )}
     </div>
     <div className="mb-5">
-      <Image src={review.image} width={500} height={500} alt={review.title} className="w-full h-auto object-cover rounded-md" />
+      <Image src={review.image} width={500} height={500} alt={review.title} priority className="w-full h-auto object-cover rounded-md" />
     </div>
     <div className='flex justify-center'>
       <hr className="w-full border-t border-gray-300 my-4 " />

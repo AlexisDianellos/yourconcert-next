@@ -27,18 +27,18 @@ const Review = ({_id,title,content,image,createdAt,createdBy})=>{
   }
   
   return(
-    <div className='items-center p-1 cursor-pointer lg:w-3/5 md:w-3/5 sm:w-3/5 xs:w-full mx-auto mt-7'>{/*post*/}
-      <Link href={`/review/${_id}`}>
+    <div className='items-center p-1 cursor-pointer lg:w-3/5 md:w-3/5 sm:w-3/5 xs:w-full mx-auto mt-7'>
         <div className='flex'>
           <Link href={`/profile/${createdBy?._id}`}>
             <p className='font-semibold mr-1 hover:underline'>{createdBy?.name}</p>
           </Link>
           <time className='text-gray-200'>• {displayDate}</time>
         </div>
+        <Link href={`/review/${_id}`}>
         <h1 className='text-md font-semibold mt-1'>{title}</h1>
         <div className='flex justify-center'>
         <div className='w-full h-96 overflow-hidden rounded-md mt-2 mb-2'>
-            <Image src={image} width={500} height={500} className='w-full h-full object-cover' alt={title}></Image>
+            <Image src={image} width={500} height={500} className='w-full h-full object-cover' priority alt={title}></Image>
           </div>
         </div>
         <p className='text-md text-gray-200'dangerouslySetInnerHTML={{ __html: content.length > 45 ? content.substring(0, 45) + '...' : content }}></p>

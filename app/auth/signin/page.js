@@ -41,10 +41,10 @@ export default function SignIn() {
           </button>
         </div>
           
-        <div class="flex items-center my-4">
-          <hr class="flex-grow border-t border-gray-300" />
-          <span class="mx-2 font-semibold">OR</span>
-          <hr class="flex-grow border-t border-gray-300" />
+        <div className="flex items-center my-4">
+          <hr className="flex-grow border-t border-gray-300" />
+          <span className="mx-2 font-semibold">OR</span>
+          <hr className="flex-grow border-t border-gray-300" />
         </div>
 
         <form className="space-y-7" onSubmit={handleSubmit}>

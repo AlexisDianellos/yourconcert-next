@@ -3,9 +3,12 @@ import { useState,useRef,useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import HeaderStar from '@/components/HeaderStar';
-import ReactQuill from "react-quill";
-import 'react-quill/dist/quill.snow.css';
 import Image from 'next/image';
+
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 const modules = {
   toolbar: [
@@ -136,6 +139,9 @@ const Edit = () => {
 
   }
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <form onSubmit={handleSubmit} className="p-7 w-full lg:w-2/3 mx-auto flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl font-bold text-center mb-10">Edit Review</h1>
@@ -149,32 +155,32 @@ const Edit = () => {
         />
         <div className="flex items-center">
           <HeaderStar header="Performance Quality" onRatingChange={setPq} value={pq}/>
-          <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('pq')}>
+          <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('pq')}>
             help
           </span>
         </div>
 
         <div className="flex items-center">
           <HeaderStar header="Setlist/Song Choices" onRatingChange={setSongs} value={songs}/>
-          <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('song')}>
+          <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('song')}>
             help
           </span>
         </div>
         <div className="flex items-center">
         <HeaderStar header="Crowd Interaction" onRatingChange={setCrowds} value={crowd}/>
-        <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('crowd')}>
+        <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('crowd')}>
           help
         </span>
         </div>
         <div className="flex items-center">
         <HeaderStar header="Visuals" onRatingChange={setVisuals} value={visuals}/>
-        <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('visuals')}>
+        <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('visuals')}>
           help
         </span>
         </div>
         <div className="flex items-center">
         <HeaderStar header="Venue"onRatingChange={setVenue}/>
-        <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('venue')}>
+        <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('venue')}>
           help
         </span>
         </div>
@@ -194,7 +200,7 @@ const Edit = () => {
       <hr className="w-full border-t border-gray-300 p-3" />
         <div className="flex items-center">
           <p className='text-center text-2xl font-bold p-5'>Review</p>
-          <span class="material-symbols-outlined text-gray-400" onClick={() => handleClick('review')}>
+          <span className="material-symbols-outlined text-gray-400" onClick={() => handleClick('review')}>
             help
           </span>
         </div>
@@ -212,7 +218,7 @@ const Edit = () => {
           <h1 className="font-bold text-xl p-5">Current Review Cover</h1>
           <div className="flex justify-center">
           <div className='w-3/4 h-96 overflow-hidden rounded-md mt-2 mb-2'>
-            <Image src={image} width={500} height={500} className='w-full h-full object-cover'></Image>
+            <Image src={image} width={500} height={500} alt={title} className='w-full h-full object-cover'></Image>
           </div>
           </div>
           <p className="font-bold text-xl p-5">OR</p>

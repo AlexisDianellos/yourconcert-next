@@ -6,21 +6,16 @@ import Review from '@/components/Review';
 
 const SearchPage = () => {
   const searchParams =  useSearchParams();
-  const [searchTerm, setSearchTerm] = useState('');
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    // Get the search term from the query params
-    const query = new URLSearchParams(window.location.search).get('query');
+    const query = searchParams.get('query');
     if (query) {
-      setSearchTerm(query);
-      // Fetch search results (replace with your API call)
       fetchResults(query);
     }
   }, [searchParams]);
 
   const fetchResults = async (query) => {
-    // Replace with your actual search API endpoint
     try{
     const res = await fetch(`/api/search?query=${query}`);
     const data = await res.json();
