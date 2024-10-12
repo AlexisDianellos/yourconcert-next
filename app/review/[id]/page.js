@@ -84,7 +84,7 @@ export default function ReviewDetail(){
     const visuals=parseFloat(review.visuals)||0;
     const venue=parseFloat(review.venue)||0;
 
-    const rating = Math.round(pq*0.4+songs*0.2+crowd*0.2+visuals*0.1+venue*0.1).toFixed(1);
+    const rating = (pq*0.4+songs*0.2+crowd*0.2+visuals*0.1+venue*0.1).toFixed(1);
     return rating;
   }
   
@@ -148,7 +148,7 @@ export default function ReviewDetail(){
           </div>
       )}
     </div>
-    <div className="mb-5">
+    <div className="mb-5 flex justify-center">
       <Image src={review.image} width={500} height={500} alt={review.title} priority className="w-full h-auto object-cover rounded-md" />
     </div>
     <div className='flex justify-center'>

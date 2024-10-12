@@ -236,7 +236,7 @@ const Edit = () => {
               modules={modules}
               formats={formats}
               onChange={(newValue) => setContent(newValue)}
-              className='bg-white text-black'
+              className='bg-white text-black lg:w-1/2 md:w-1/2 w-5/6'
               />
   
       <hr className="w-full border-t border-gray-300 p-3 mt-10" />
